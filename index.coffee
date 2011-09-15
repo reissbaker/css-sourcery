@@ -128,7 +128,8 @@ lift = (content) ->
 					rules = getRules liftedChild
 					lifted.push(content.selector + ' ' + r) for r in rules
 				else
-					lifted.push(new Rule(content.selector + ' ' + liftedChild.selector, liftedChild.styles))
+					combinedSelector = content.selector + (unless liftedChild.selector.charAt(0) == ':' then ' ' else '') + liftedChild.selector
+					lifted.push(new Rule(combinedSelector, liftedChild.styles))
 			else
 				filtered.styles.push ensureSemicolon(liftedChild)
 	lifted.push filtered if filtered.styles.length > 0
@@ -146,7 +147,7 @@ compile = (content, depth) ->
 	if typeOf(content) == 'string'
 		return if depth > 0 then "\n\t#{content}" else "\n#{content}"
 	# only other allowable option is a Rule
-	return "\n#{content.selector}{" + compile(content.styles, depth+1) + "\n}"
+	return "\n#{content.selector} {" + compile(content.styles, depth+1) + "\n}"
 
 
 ###
@@ -155,7 +156,11 @@ compile = (content, depth) ->
 ###
 
 class Rule
-	constructor: (@selector, @styles) ->
+	constructor: (@selector, styles) ->
+		unless isArray styles
+			@styles = [styles]
+		else
+			@styles = styles
 	compile: (params) ->
 		unless params
 			params = {}
@@ -177,3 +182,24 @@ exports.concatenate = (array) ->
 	concatenateAll array
 exports.rule = (selector, styles) ->
 	new Rule selector, styles
+
+buildRule = (selector) ->
+	(styles) ->
+		exports.rule selector, styles
+
+# throw in some sugar for creating most HTML5 tags
+tags = [
+	'a', 'abbr', 'address', 'article', 'aside', 'audio', 'b', 'bb', 'bdo', 'blockquote', 'body',
+	'button', 'canvas', 'caption', 'cite', 'code', 'colgroup', 'datagrid', 'datalist', 'dd', 'del',
+	'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'fieldset', 'figure', 'footer', 'form',
+	'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'html', 'i', 'iframe', 'ins', 'kbd',
+	'label', 'legend', 'li', 'map', 'mark', 'menu', 'meter', 'nav', 'noscript', 'object', 'ol',
+	'optgroup', 'option', 'output', 'p', 'pre', 'progress', 'q', 'rp', 'rt', 'ruby', 'samp', 
+	'script', 'section', 'select', 'small', 'span', 'strong', 'style', 'sub', 'sup', 'table',
+	'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'ul', 'var', 'video'
+	'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param',
+	'source'
+]
+
+for tag in tags
+	exports[tag] = buildRule(tag)

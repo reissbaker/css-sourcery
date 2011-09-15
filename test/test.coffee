@@ -69,6 +69,20 @@ exports.suite = vows.describe('CSS Sourcery').addBatch(
 					['font-size:2px', 'color:#fff']
 				).compile({})), testRule)
 
+			'should allow arrays of CSS properties as children': (topic) ->
+				assert.equal(src.minify(topic('div', [
+					[
+						'font-size:2px'
+						'color:#fff'
+					]
+				]).compile({})), testRule)
+			'should allow valid CSS to be passed instead of an array': (topic) ->
+				assert.equal(src.minify(topic('div', 'font-size:2px;color:#fff;').compile({})), testRule)
+			'should allow functions to be passed instead of an array': (topic) ->
+				assert.equal(src.minify(topic('div', (params) ->
+					'font-size:2px;color:#fff;'
+				).compile({})), testRule)
+
 		'with nesting':
 			topic: (topic) -> topic
 			'should lift nested child rules': (topic) ->
@@ -79,6 +93,11 @@ exports.suite = vows.describe('CSS Sourcery').addBatch(
 						'top:10px'
 					]
 				]).compile({})), nestedTestRule)
+
+			'should correctly lift nested child pseudo-classes': (topic) ->
+				assert.equal(src.minify(topic('a', [
+					topic ':hover', 'color:red'
+				]).compile({})), 'a:hover{color:red;}')
 
 			'should lift nested child CSS string rules': (topic) ->
 				assert.equal(src.minify(topic('div', [
@@ -110,6 +129,7 @@ exports.suite = vows.describe('CSS Sourcery').addBatch(
 						}
 						"""
 				]).compile({})), nestedTestRule)
+
 		'with functions that take parameters':
 			topic: (topic) -> topic
 			'should pass the parameters to child functions': (topic) ->
@@ -127,6 +147,7 @@ exports.suite = vows.describe('CSS Sourcery').addBatch(
 						'top:10px'
 					]
 				]).compile({position:'relative'})), nestedTestRule)
+
 		'with functions that don\'t take parameters':
 			topic: (topic) -> topic
 			'should allow parameters to be omitted': (topic) ->

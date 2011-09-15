@@ -2,7 +2,7 @@
 	Utility functions.
 	==================
 */
-var Rule, compile, concatenateAll, ensureSemicolon, getMatches, getRules, getStyles, isArray, lift, minify, needsLift, precompile, rule, singleSpace, style, trim, typeOf;
+var Rule, buildRule, compile, concatenateAll, ensureSemicolon, getMatches, getRules, getStyles, isArray, lift, minify, needsLift, precompile, rule, singleSpace, style, tag, tags, trim, typeOf, _i, _len;
 isArray = function(value) {
   var s;
   s = typeof value;
@@ -94,7 +94,7 @@ needsLift = function(content) {
   return true;
 };
 lift = function(content) {
-  var c, child, filtered, lifted, liftedChild, liftedChildren, r, rules, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref;
+  var c, child, combinedSelector, filtered, lifted, liftedChild, liftedChildren, r, rules, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref;
   lifted = [];
   if (typeOf(content) === 'array') {
     for (_i = 0, _len = content.length; _i < _len; _i++) {
@@ -122,7 +122,8 @@ lift = function(content) {
             lifted.push(content.selector + ' ' + r);
           }
         } else {
-          lifted.push(new Rule(content.selector + ' ' + liftedChild.selector, liftedChild.styles));
+          combinedSelector = content.selector + (liftedChild.selector.charAt(0) !== ':' ? ' ' : '') + liftedChild.selector;
+          lifted.push(new Rule(combinedSelector, liftedChild.styles));
         }
       } else {
         filtered.styles.push(ensureSemicolon(liftedChild));
@@ -151,7 +152,7 @@ compile = function(content, depth) {
       return "\n" + content;
     }
   }
-  return ("\n" + content.selector + "{") + compile(content.styles, depth + 1) + "\n}";
+  return ("\n" + content.selector + " {") + compile(content.styles, depth + 1) + "\n}";
 };
 /*
 	Classes.
@@ -160,7 +161,11 @@ compile = function(content, depth) {
 Rule = (function() {
   function Rule(selector, styles) {
     this.selector = selector;
-    this.styles = styles;
+    if (!isArray(styles)) {
+      this.styles = [styles];
+    } else {
+      this.styles = styles;
+    }
   }
   Rule.prototype.compile = function(params) {
     if (!params) {
@@ -190,3 +195,13 @@ exports.concatenate = function(array) {
 exports.rule = function(selector, styles) {
   return new Rule(selector, styles);
 };
+buildRule = function(selector) {
+  return function(styles) {
+    return exports.rule(selector, styles);
+  };
+};
+tags = ['a', 'abbr', 'address', 'article', 'aside', 'audio', 'b', 'bb', 'bdo', 'blockquote', 'body', 'button', 'canvas', 'caption', 'cite', 'code', 'colgroup', 'datagrid', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'fieldset', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'html', 'i', 'iframe', 'ins', 'kbd', 'label', 'legend', 'li', 'map', 'mark', 'menu', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'pre', 'progress', 'q', 'rp', 'rt', 'ruby', 'samp', 'script', 'section', 'select', 'small', 'span', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'ul', 'var', 'video', 'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source'];
+for (_i = 0, _len = tags.length; _i < _len; _i++) {
+  tag = tags[_i];
+  exports[tag] = buildRule(tag);
+}

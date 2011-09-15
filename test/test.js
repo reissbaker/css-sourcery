@@ -72,6 +72,17 @@ exports.suite = vows.describe('CSS Sourcery').addBatch({
         return assert.equal(src.minify(topic('div', function(params) {
           return ['font-size:2px', 'color:#fff'];
         }).compile({})), testRule);
+      },
+      'should allow arrays of CSS properties as children': function(topic) {
+        return assert.equal(src.minify(topic('div', [['font-size:2px', 'color:#fff']]).compile({})), testRule);
+      },
+      'should allow valid CSS to be passed instead of an array': function(topic) {
+        return assert.equal(src.minify(topic('div', 'font-size:2px;color:#fff;').compile({})), testRule);
+      },
+      'should allow functions to be passed instead of an array': function(topic) {
+        return assert.equal(src.minify(topic('div', function(params) {
+          return 'font-size:2px;color:#fff;';
+        }).compile({})), testRule);
       }
     },
     'with nesting': {
@@ -80,6 +91,9 @@ exports.suite = vows.describe('CSS Sourcery').addBatch({
       },
       'should lift nested child rules': function(topic) {
         return assert.equal(src.minify(topic('div', ['font-size:2px', topic('h2', ['position:relative', 'top:10px'])]).compile({})), nestedTestRule);
+      },
+      'should correctly lift nested child pseudo-classes': function(topic) {
+        return assert.equal(src.minify(topic('a', [topic(':hover', 'color:red')]).compile({})), 'a:hover{color:red;}');
       },
       'should lift nested child CSS string rules': function(topic) {
         return assert.equal(src.minify(topic('div', ['font-size:2px', "h2 {\n	position:relative;\n	top:10px;\n}"]).compile({})), nestedTestRule);
