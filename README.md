@@ -19,7 +19,8 @@ src.compile(src.rule('.sourcery', [
 ```
 
 Compiles to:
-```CSS
+
+```css
 .sourcery ul {
 	list-style-type:none;
 	color:yellow;
