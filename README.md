@@ -6,8 +6,8 @@ functions, optional minification, partials and partial caching.
 ```require``` in code from the rest of your app where you need it, and feel free to drop down to native CSS as you
 see fit.
 
-LET'S DO THIS
--------------
+LET'S MAKE MAGIC
+----------------
 
 ```javascript
 var src = require('css-sourcery');
@@ -29,7 +29,7 @@ src.compile([
 ], { dumbledore: true });
 ```
 
-SAY THAT AGAIN?
+ABRACA-WHAT?
 ---------------
 
 ```css
