@@ -1,0 +1,19 @@
+{
+  "author": "Matt Baker",
+  "name": "css-sourcery",
+  "description": "A code-as-data take on conjuring up CSS",
+  "version": "0.0.2",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/reissbaker/css-sourcery.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "vows test/test.js --spec"
+  },
+  "engines": {
+    "node": ">= 0.4.1"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
