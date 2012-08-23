@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/reissbaker/css-sourcery.png)](http://travis-ci.org/reissbaker/css-sourcery)
 CSS SOURCERY
 ============
 
